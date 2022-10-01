@@ -1,25 +1,9 @@
-# ReadMe
+# Big Data Programming - Visualization of OpenWeatherMap Data
 
-**Big Data Programming**<br>
-Dozentin: Lisa Weinzierl<br>
-DHBW Ravensburg<br>
-RV-WWIDS120<br>
+## Part I:
 
-Name Studierende: Timo Heiß<br>
-Matrikelnummer: 3739454
+*Fetching von Sensordaten/Vorhersage-Daten (https://openweathermap.org/forecast5) und "buffern" in Kafka. Daten sollen häufiger gelesen werden, als der Sensor seine Messdaten intervallbasiert aktualisiert (möglichen Service-Ausfall kompensieren).*
 
-## Aufgabe 1:
-*--> Siehe Screenshots (papierhaft oder Schriftliche_Ausarbeitung.docx)*
-
-## Aufgabe 2:
-Im vorliegenden Fall sollen Daten kontinuierlich abgefragt werden. Es handelt sich also um realtime bzw. Streaming-Daten. Für diese Aufgabe bietet sich eine event-zentrische Architektur an. Dabei geben Produzenten Daten in Form von Nachrichten an einen Event-Broker (--> der Produzent „publiziert“ eine Nachricht). Der Event-Broker stellt in der event-zentrischen Architektur die Single-Source-of-Truth dar. Der Broker speichert die Nachrichten der Produzenten in Topics, welche jeweils in mehrere Partitionen aufgeteilt sein können. Die Nachrichten der Produzenten werden über sämtliche Partitionen verteilt, die zum entsprechenden Topic gehören. Konsumenten können nun die Daten vom Event-Broker aus den entsprechenden Topics/Partitionen lesen. Dies kann auch durch mehrere Konsumenten parallel geschehen. Im vorliegenden Fall würde ein Produzent die Sensordaten über die OpenWeatherMap-API abfragen und diese in einem Topic des Event-Brokers abspeichern. Ein Service, der die realtime Graphik erstellt, wäre nun Konsument, der die Daten aus dem Topic konsumiert.
-
-Vorteil der event-zentrischen Architektur ist, dass auch Streaming-Daten mit dieser Architektur problemlos verarbeitet werden können. Außerdem sind Datenquellen und Datennutzer durch den Event-Broker voneinander entkoppelt. Daraus ergibt sich, dass neue Datenbanken mit neuen Anforderungen problemlos hinzugefügt werden können, ohne dass dies die Produzenten dieser Daten betrifft. Neben der höheren Komplexität der Architektur, für die aktuell noch weniger Erfahrung als mit dem klassischen daten-zentrischen Ansatz vorhanden ist, ist vor allem folgender Nachteil relevant: Bei event-zentrischen Architekturen mit Event-Brokern ist ebendieser Eventbroker eine kritische Komponente. Dessen Ausfall kann damit weitreichende Folgen haben und sollte durch ein entsprechendes Ausfallkonzept abgesichert werden.
-
-Die beschriebene Architektur kann mit Apache Kafka umgesetzt werden.
-
-
-## Aufgabe 3:
 
 Diese Aufgabe wurde in *CollectAndCleanData.ipynb* gelöst.
 
@@ -39,7 +23,9 @@ Diese Aufgabe wurde in *CollectAndCleanData.ipynb* gelöst.
 ##### Erläuterung, Zusammenhänge und Abhängigkeiten:
 In einer Endlos-Schleife wird die Funktion collect_forecast_data() alle 15 Minuten aufgerufen (clean_forecast_data() kann für diese Aufgabe ignoriert werden). Zunächst werden mit der Funktion load_locations() die Orte geladen. Anschließend wird durch diese Orte iteriert. Für jeden Ort geschieht folgendes: Die 5-Tage Vorhersage für diesen Ort wird von OpenWeatherMap abgefragt mithilfe der get_forecast()-Methode der OpenWeatherMap-Klasse (bereits vorgegeben). Für jedes Element der Vorhersage ("für jeden Zeitpunkt") passiert folgendes: Zum Vorhersage-Dictionary wird der Ort mitsamt Geokoordinaten hinzugefügt und der aktuelle Zeitstempel ergänzt. Dies wird nun als Message mit zufällig generierter UUID als key durch den Kafka-Produzent in das Kafka-Topic "weather.forecast.raw" geschrieben. Hierzu wird der Kafka-Reader kafka_prod1 und dessen store()-Methode verwendet (Implementierung bereits vorgegeben).
 
-## Aufgabe 4:
+## Part II:
+
+*Aufgrund der Ausfallkompensation treten Dubletten von Messwerten auf. Diese sollen in der Streaming-Pipeline erkannt werden. In einem separaten Topic sollen die "gecleanten" Werte abgespeichert werden.*
 
 Diese Aufgabe wurde ebenfalls in *CollectAndCleanData.ipynb* gelöst.
 
@@ -59,7 +45,9 @@ In der oben beschriebenen Endlos-Schleife wird nun nach Aufruf der collect_forec
 
 **Hinweis:** *Als Dubletten werden hier nur Elemente gezählt, die 1zu1 (abgesehen vom fetch-Zeitstempel) übereinstimmen. Das heißt, Elemente die veraltet sind, weil es inzwischen eine neuere Vorhersage gibt, werden hier nicht herausgefiltert. Diese Aufgabe obliegt dem jeweiligen Konsumenten. Hintergedanke ist, dass ein anderer Service mit anderem Konsumenten vielleicht die "Entwicklung" einer Vorhersage darstellen möchte (d.h. wie die Vorhersage genauer wird je näher man dem Zeitpunkt des Eintreffens kommt).*
 
-## Aufgabe 5:
+## Part III:
+
+*Erstellung eines Microservice, welcher eine Infographik zur Verfügung stellt um die Messwerte darzustellen.*
 
 Für diese Aufgabe muss *ShowData_01.ipynb* ausgeführt werden. Die Grafiken werden dann in diesem Notebook angezeigt.
 
@@ -93,7 +81,9 @@ Auch diese Karte ist ähnlich aufgebaut wie die Vorherigen. Nun wird jedoch der 
 
 Zur Visualisierung von statischen (nicht automatisch aktualisierenden) Wetterkarten wird die selbst geschriebene Klasse StaticWeatherMapVisualizer in visualization.py verwendet. Für jede der drei Grafik-Arten (s.o.) steht eine Methode zur Verfügung, um eine entsprechende Grafik zu erstellen. Da sich alle drei Wetterkarten bei der Erstellung nur in wenigen Details unterscheiden, basieren alle drei Visualierungs-Methoden auf derselben Basismethode (\_create\_map()). In dieser Methode werden zunächst, wenn nicht bereits im Zuge der Erstellung einer anderen Grafik geschehen, die Daten aus dem Topic "weather.forecast.clean" mithilfe eines Kafka-Konsumenten ausgelesen und in ein DataFrame geschrieben durch Aufruf der Methode get_dataframe() (+anschließende Vorverarbeitung). Nun wird mit diesen Daten eine Figure erzeugt mithilfe der plotly.express-Funktion scatter_geo(). Nach weiteren Anpassungen am Layout der Grafik wird die erzeugte Figure-Instanz zurückgegeben. Diese \_create\_map()-Methode wird in allen drei Visualisierungsmethoden aufgerufen. Jeweils werden als Methoden-Parameter die Werte übergeben, die für den jeweiligen Grafiktyp notwendig sind (z.B. u.a. color="main.temp" für Temperaturkarte). Die Visualisierungsmethoden stellen dann die erzeugte Figure im Output der Jupyter Notebook-Zelle dar (mithilfe der show()-Methode).
 
-## Aufgabe 6:
+## Part IV:
+
+*Anpassung der Infographik, dass sich die Werte bei einer Erneuerung der Messung (neue Message in Kafka) automatisch aktualisieren und so der Infografik immer die aktuellen Daten zur Verfügung stehen.*
 
 Für diese Aufgabe muss *ShowData_02.ipynb* ausgeführt werden. Die Grafiken werden dann in diesem Notebook angezeigt und solange das Notebook läuft auch regelmäßig aktualisiert.
 
