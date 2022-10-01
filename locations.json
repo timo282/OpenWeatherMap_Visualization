@@ -1,0 +1,86 @@
+{
+    "Berlin": {
+        "latitude": 52.5244,
+        "longitude": 13.4105
+    },
+    "Dresden": {
+        "latitude": 51.0509,
+        "longitude": 13.7383
+    },
+    "Frankfurt am Main": {
+        "latitude": 50.1167,
+        "longitude": 8.6833
+    },
+    "Freiburg": {
+        "latitude": 47.9959,
+        "longitude": 7.8522
+    },
+    "Kiel": {
+        "latitude": 54.3213,
+        "longitude": 10.1349
+    },
+    "K\u00f6ln": {
+        "latitude": 50.9333,
+        "longitude": 6.95
+    },
+    "Leipzig": {
+        "latitude": 51.342,
+        "longitude": 12.375
+    },
+    "Mannheim": {
+        "latitude": 49.4883,
+        "longitude": 8.4647
+    },
+    "M\u00fcnchen": {
+        "latitude": 48.1374,
+        "longitude": 11.5755
+    },
+    "M\u00fcnster": {
+        "latitude": 51.9624,
+        "longitude": 7.6257
+    },
+    "Ravensburg": {
+        "latitude": 47.7833,
+        "longitude": 9.6167
+    },
+    "Rostock": {
+        "latitude": 54.0887,
+        "longitude": 12.1405
+    },
+    "Stuttgart": {
+        "latitude": 48.7823,
+        "longitude": 9.177
+    },
+    "N\u00fcrnberg": {
+        "latitude": 49.4478,
+        "longitude": 11.0683
+    },
+    "Bremen": {
+        "latitude": 53.0752,
+        "longitude": 8.8078
+    },
+    "Hamburg": {
+        "latitude": 53.55,
+        "longitude": 10
+    },
+    "Hannover": {
+        "latitude": 52.3705,
+        "longitude": 9.7332
+    },
+    "W\u00fcrzburg": {
+        "latitude": 49.7878,
+        "longitude": 9.9361
+    },
+    "Paderborn": {
+        "latitude": 51.7191,
+        "longitude": 8.7544
+    },
+    "Kassel": {
+        "latitude": 51.3167,
+        "longitude": 9.5
+    },
+    "Saarbr\u00fccken": {
+        "latitude": 49.2333,
+        "longitude": 7
+    }
+}
